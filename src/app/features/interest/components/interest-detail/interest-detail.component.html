@@ -1,0 +1,27 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th class="text-center">Year</th>
+      <th class="text-center">Present Value</th>
+      <th class="text-center">Interest Rate</th>
+      <th class="text-center">Future Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="!interestDetails.length">
+      <td class="text-center" colspan="4">No data</td>
+    </tr>
+    <tr *ngFor="let interestDetail of interestDetails">
+      <td class="text-center">{{ interestDetail.year }}</td>
+      <td class="text-end">
+        {{ interestDetail.presentValue | number: "1.2-2" }}
+      </td>
+      <td class="text-end">
+        {{ interestDetail.interestRate / 100 | percent: "1.2-2" }}
+      </td>
+      <td class="text-end">
+        {{ interestDetail.futureValue | number: "1.2-2" }}
+      </td>
+    </tr>
+  </tbody>
+</table>
