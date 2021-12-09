@@ -1,10 +1,15 @@
 <div class="h-100 col-md-8 col-lg-4 mx-auto">
+  <div class="row my-3 col-2 ms-auto">
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+
   <div *ngIf="isLoading" class="h-auto my-5">Loading..</div>
+
   <form
     [formGroup]="interestForm"
     (ngSubmit)="onSubmit()"
     *ngIf="!isLoading"
-    class="h-auto my-5"
+    class="h-auto"
   >
     <div class="row mb-3">
       <strong for="presentValue" class="form-label col-8 align-self-center"
@@ -63,7 +68,10 @@
         >
           Lower Bound Interest Rate is required
         </small>
-        <small *ngIf="interestForm.errors?.['greaterThan']" class="text-danger">
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
           Lower Bound Interest Rate must be less than Upper Bound Interest Rate
         </small>
       </div>
@@ -102,7 +110,10 @@
         >
           Upper Bound Interest Rate is required
         </small>
-        <small *ngIf="interestForm.errors?.['greaterThan']" class="text-danger">
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
           Upper Bound Interest Rate must be greater than Lower Bound Interest
           Rate
         </small>
@@ -168,8 +179,14 @@
       <button
         id="save"
         class="btn col-2 ms-auto me-2"
-        [ngClass]="this.interestForm.invalid ? 'btn-secondary' : 'btn-primary'"
-        [disabled]="this.interestForm.invalid"
+        [ngClass]="
+          this.interestForm.invalid || interest.interestDetails.length === 0
+            ? 'btn-secondary'
+            : 'btn-primary'
+        "
+        [disabled]="
+          this.interestForm.invalid || interest.interestDetails.length === 0
+        "
       >
         Save
       </button>

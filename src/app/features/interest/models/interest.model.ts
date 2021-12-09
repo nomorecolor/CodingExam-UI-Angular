@@ -10,6 +10,8 @@ export class Interest {
   public incrementalRate: number = 0;
   public maturityYears: number = 0;
 
+  public userId: number = 0;
+
   constructor() {
     this.calculateInterest.bind(this);
   }

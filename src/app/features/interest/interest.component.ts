@@ -1,7 +1,16 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { greaterThanValidator } from 'src/app/shared/validators/greater-than.validator';
+import { Router } from '@angular/router';
+import {
+  AlertService,
+  AuthService,
+  TokenService,
+} from 'src/app/shared/services';
+import {
+  CompareNumberEnum,
+  compareNumberValidator,
+} from 'src/app/shared/validators/compare-number.validator';
 import { Interest } from './models/interest.model';
 import { InterestService } from './services/interest.service';
 
@@ -14,40 +23,61 @@ export class InterestComponent implements OnInit {
   interest: Interest = new Interest();
   interestForm!: FormGroup;
 
+  id: number = 0;
+
   isSubmitted = false;
-  isLoading: boolean = true;
+  isLoading = true;
+
+  noData = false;
 
   constructor(
     private fb: FormBuilder,
-    private interestService: InterestService
+    private router: Router,
+    private authService: AuthService,
+    private interestService: InterestService,
+    private alertService: AlertService,
+    private tokenService: TokenService
   ) {}
 
   ngOnInit(): void {
     this.interestForm = this.fb.group(
       {
-        id: [''],
+        id: [0],
         presentValue: [0, [Validators.required]],
         lowerBoundInterestRate: [0, [Validators.required]],
         upperBoundInterestRate: [0, [Validators.required]],
         incrementalRate: [0, [Validators.required]],
         maturityYears: [0, [Validators.required]],
+        userId: [0],
       },
       {
         validators: [
-          greaterThanValidator(
+          compareNumberValidator(
             'lowerBoundInterestRate',
-            'upperBoundInterestRate'
+            'upperBoundInterestRate',
+            CompareNumberEnum.lessThanEqual
           ),
         ],
         updateOn: 'blur',
       }
     );
 
-    // const id = Number(this.route.snapshot.paramMap.get('id')!);
+    this.id = this.tokenService.getToken()!.currentUser.id;
 
     this.interestService
-      .getInterest(1)
-      .subscribe((res) => this.interestForm.patchValue(res))
+      .getInterest(this.id)
+      .subscribe({
+        next: (res) => this.interestForm.patchValue(res),
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 400)
+            this.alertService.error().then(() => {
+              this.tokenService.clearToken();
+              this.router.navigate(['/']);
+            });
+
+          if (err.status === 404) this.noData = true;
+        },
+      })
       .add(() => (this.isLoading = false));
 
     this.interestForm.valueChanges.subscribe(() => {
@@ -88,12 +118,51 @@ export class InterestComponent implements OnInit {
       return;
     }
 
-    this.interestService
-      .editInterest(this.interest)
-      .subscribe((res) => this.interestForm.patchValue(res))
-      .add(() => {
-        this.isLoading = false;
-        this.isSubmitted = true;
-      });
+    if (this.noData) {
+      this.interest.userId = this.id;
+
+      this.interestService
+        .addInterest(this.interest)
+        .subscribe({
+          next: (res) => {
+            this.interestForm.patchValue(res);
+            this.noData = false;
+          },
+          error: (err: HttpErrorResponse) => {
+            if (err.error?.errors) {
+              this.alertService.error(
+                undefined,
+                err.error.errors[Object.keys(err.error.errors)[0]][0]
+              );
+            } else if (err.error) this.alertService.error(undefined, err.error);
+          },
+        })
+        .add(() => {
+          this.isLoading = false;
+          this.isSubmitted = true;
+        });
+    } else {
+      this.interestService
+        .editInterest(this.interest)
+        .subscribe({
+          next: (res) => this.interestForm.patchValue(res),
+          error: (err: HttpErrorResponse) => {
+            if (err.error?.errors) {
+              this.alertService.error(
+                undefined,
+                err.error.errors[Object.keys(err.error.errors)[0]][0]
+              );
+            } else if (err.error) this.alertService.error(undefined, err.error);
+          },
+        })
+        .add(() => {
+          this.isLoading = false;
+          this.isSubmitted = true;
+        });
+    }
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
