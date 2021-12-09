@@ -63,7 +63,10 @@
         >
           Lower Bound Interest Rate is required
         </small>
-        <small *ngIf="interestForm.errors?.['greaterThan']" class="text-danger">
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
           Lower Bound Interest Rate must be less than Upper Bound Interest Rate
         </small>
       </div>
@@ -102,7 +105,10 @@
         >
           Upper Bound Interest Rate is required
         </small>
-        <small *ngIf="interestForm.errors?.['greaterThan']" class="text-danger">
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
           Upper Bound Interest Rate must be greater than Lower Bound Interest
           Rate
         </small>
