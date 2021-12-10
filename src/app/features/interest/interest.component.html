@@ -1,0 +1,198 @@
+<div class="h-100 col-md-8 col-lg-4 mx-auto">
+  <div class="row my-3 col-2 ms-auto">
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+
+  <div *ngIf="isLoading" class="h-auto my-5">Loading..</div>
+
+  <form
+    [formGroup]="interestForm"
+    (ngSubmit)="onSubmit()"
+    *ngIf="!isLoading"
+    class="h-auto"
+  >
+    <div class="row mb-3">
+      <strong for="presentValue" class="form-label col-8 align-self-center"
+        >Present Value:</strong
+      >
+      <div class="col-4">
+        <input
+          class="form-control text-end"
+          id="presentValue"
+          formControlName="presentValue"
+          type="number"
+        />
+      </div>
+      <div
+        *ngIf="
+          presentValue.invalid && (presentValue.dirty || presentValue.touched)
+        "
+        [ngClass]="'error'"
+      >
+        <small *ngIf="presentValue.errors?.['required']" class="text-danger">
+          Present Value is required
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <strong
+        for="lowerBoundInterestRate"
+        class="form-label col-8 align-self-center"
+        >Lower Bound Interest Rate:</strong
+      >
+      <div class="col-4">
+        <div class="input-group">
+          <input
+            class="form-control text-end"
+            id="lowerBoundInterestRate"
+            formControlName="lowerBoundInterestRate"
+            type="number"
+          />
+          <div class="input-group-append">
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="
+          (lowerBoundInterestRate.invalid &&
+            (lowerBoundInterestRate.dirty || lowerBoundInterestRate.touched)) ||
+          interestForm.invalid
+        "
+        [ngClass]="'error'"
+      >
+        <small
+          *ngIf="lowerBoundInterestRate.errors?.['required']"
+          class="text-danger"
+        >
+          Lower Bound Interest Rate is required
+        </small>
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
+          Lower Bound Interest Rate must be less than Upper Bound Interest Rate
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <strong
+        for="upperBoundInterestRate"
+        class="form-label col-8 align-self-center"
+        >Upper Bound Interest Rate:</strong
+      >
+      <div class="col-4">
+        <div class="input-group">
+          <input
+            class="form-control text-end"
+            id="upperBoundInterestRate"
+            formControlName="upperBoundInterestRate"
+            type="number"
+          />
+          <div class="input-group-append">
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="
+          (upperBoundInterestRate.invalid &&
+            (upperBoundInterestRate.dirty || upperBoundInterestRate.touched)) ||
+          interestForm.invalid
+        "
+        [ngClass]="'error'"
+      >
+        <small
+          *ngIf="upperBoundInterestRate.errors?.['required']"
+          class="text-danger"
+        >
+          Upper Bound Interest Rate is required
+        </small>
+        <small
+          *ngIf="interestForm.errors?.['compareNumber']"
+          class="text-danger"
+        >
+          Upper Bound Interest Rate must be greater than Lower Bound Interest
+          Rate
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <strong for="incrementalRate" class="form-label col-8 align-self-center"
+        >Incremental Rate:</strong
+      >
+      <div class="col-4">
+        <div class="input-group">
+          <input
+            class="form-control text-end"
+            id="incrementalRate"
+            formControlName="incrementalRate"
+            type="number"
+          />
+          <div class="input-group-append">
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="
+          incrementalRate.invalid &&
+          (incrementalRate.dirty || incrementalRate.touched)
+        "
+        [ngClass]="'error'"
+      >
+        <small *ngIf="incrementalRate.errors?.['required']" class="text-danger">
+          Incremental Rate is required
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <strong for="maturityYears" class="form-label col-8 align-self-center"
+        >Maturity Year(s):</strong
+      >
+      <div class="col-4">
+        <input
+          class="form-control text-end"
+          id="maturityYears"
+          formControlName="maturityYears"
+          type="number"
+        />
+      </div>
+      <div
+        *ngIf="
+          maturityYears.invalid &&
+          (maturityYears.dirty || maturityYears.touched)
+        "
+        [ngClass]="'error'"
+      >
+        <small *ngIf="maturityYears.errors?.['required']" class="text-danger">
+          Maturity Year(s) is required
+        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <button
+        id="save"
+        class="btn col-2 ms-auto me-2"
+        [ngClass]="
+          this.interestForm.invalid || interest.interestDetails.length === 0
+            ? 'btn-secondary'
+            : 'btn-primary'
+        "
+        [disabled]="
+          this.interestForm.invalid || interest.interestDetails.length === 0
+        "
+      >
+        Save
+      </button>
+    </div>
+    <app-interest-detail
+      [interestDetails]="interest.interestDetails"
+    ></app-interest-detail>
+  </form>
+</div>
