@@ -69,11 +69,7 @@ export class InterestComponent implements OnInit {
       .subscribe({
         next: (res) => this.interestForm.patchValue(res),
         error: (err: HttpErrorResponse) => {
-          if (err.status === 400)
-            this.alertService.error().then(() => {
-              this.tokenService.clearToken();
-              this.router.navigate(['/']);
-            });
+          if (err.status === 400) this.alertService.error();
 
           if (err.status === 404) this.noData = true;
         },
@@ -127,15 +123,10 @@ export class InterestComponent implements OnInit {
           next: (res) => {
             this.interestForm.patchValue(res);
             this.noData = false;
+
+            this.alertService.success();
           },
-          error: (err: HttpErrorResponse) => {
-            if (err.error?.errors) {
-              this.alertService.error(
-                undefined,
-                err.error.errors[Object.keys(err.error.errors)[0]][0]
-              );
-            } else if (err.error) this.alertService.error(undefined, err.error);
-          },
+          error: () => this.alertService.error(),
         })
         .add(() => {
           this.isLoading = false;
@@ -145,15 +136,12 @@ export class InterestComponent implements OnInit {
       this.interestService
         .editInterest(this.interest)
         .subscribe({
-          next: (res) => this.interestForm.patchValue(res),
-          error: (err: HttpErrorResponse) => {
-            if (err.error?.errors) {
-              this.alertService.error(
-                undefined,
-                err.error.errors[Object.keys(err.error.errors)[0]][0]
-              );
-            } else if (err.error) this.alertService.error(undefined, err.error);
+          next: (res) => {
+            this.interestForm.patchValue(res);
+
+            this.alertService.success();
           },
+          error: () => this.alertService.error(),
         })
         .add(() => {
           this.isLoading = false;
